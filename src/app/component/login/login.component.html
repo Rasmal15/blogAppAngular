@@ -1,0 +1,40 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <label for="username">Name:</label>
+    <input id="username" formControlName="username" />
+    <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">Name is required.</div>
+  
+    <label for="password">Password:</label>
+    <input id="password" formControlName="password" type="password"/>
+    <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">Enter a valid email.</div>
+  
+    <button type="submit" [disabled]="loginForm.invalid">Submit</button>
+</form>
+
+<!-- <div class="container">
+    <div class="grid bg-success" style="display:grid;">
+        <div class="form-container form-control">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="">
+                <div class="form-input">
+                    <div class="col-4">
+                        <label for="username">Name:</label>
+                    </div>
+                    
+                    <input id='yourphone' formControlName="username" class="form-control" />
+                    <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">Name is required.</div>
+                </div>
+                
+                <div class="form-input">
+                    <div class="col-4">
+                        <label for="password">Password:</label>
+                    </div>
+                    
+                    <input id="password" formControlName="password" type="password" class="form-control"/>
+                    <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">Enter a valid email.</div>
+                </div>
+                
+              
+                <button type="submit" [disabled]="loginForm.invalid">Submit</button>
+            </form>
+        </div>
+    </div>
+</div> -->

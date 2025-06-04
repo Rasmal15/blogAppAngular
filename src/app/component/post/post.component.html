@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="card shadow-none border">
+        <div class="card-body">
+            <form method="POST" [formGroup]="postForm" (ngSubmit)="onPostSubmit()" enctype="multipart/form-data">
+                <div class="form-floating mb-3">
+                    <input type="textarea" class="form-control" id="description" formControlName="description">
+                    <label for="description">Share your thoughts</label>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="text-white d-flex align-items-center justify-content-center bg-primary p-2 fs-4 rounded-circle" for="file-input" style="cursor: pointer;">
+                        <i class="fa fa-photo"></i>
+                    </label>
+                    <input type="file" id="file-input" name="post">
+                    <button class="btn btn-primary ms-auto">Post</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+<!-- <form method="post" enctype="multipart/form-data" (ngSubmit)="onPostSubmit()">
+    <input type="text" name="description">
+    <input type="file" name="post_image">
+    <button type="submit">POST</button>
+</form> -->
