@@ -7,6 +7,7 @@ import { CommentService } from '../../services/comment.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ReplayService } from '../../services/replay.service';
 import { PostService } from '../../services/post.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -37,9 +38,13 @@ export class HomeComponent implements OnInit {
     private commentService: CommentService,
     private formBuilder: FormBuilder,
     private replayService: ReplayService,
-    private postService: PostService
+    private postService: PostService,
+    private router: Router
 
   ){
+    if (!localStorage.getItem('access_token')) {
+      this.router.navigate(['login'])
+    }
     this.homeService.home().then(res => res.json()).then((data:any) => {
       if(data.code === 'token_not_valid'){
         localStorage.removeItem('access_token')
