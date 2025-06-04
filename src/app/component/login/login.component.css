@@ -1,0 +1,15 @@
+.grid {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    height: 100vh;
+}
+.form-container {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+.form-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
