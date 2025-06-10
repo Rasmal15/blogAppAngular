@@ -27,7 +27,10 @@ export class HomeComponent implements OnInit {
   showComments: { [key: number]: boolean } = {};
   showReplays: { [key: number]: boolean } = {};
   replayForm:FormGroup;
-  showPopup:boolean = false;
+  selectedCommentId: number | null = null;
+  showPopup = false;
+  selectedReplayId: number|null = null;
+  showReplayPopup:boolean = false
 
   ngOnInit(): void {
       
@@ -83,9 +86,16 @@ export class HomeComponent implements OnInit {
     this.showReplays[commentId] = true
   }
 
-  togglePopup() {
-    this.showPopup = !this.showPopup;
+  togglePopup(commentId?: number) {
+  this.selectedCommentId = commentId || null;
+  this.showPopup = !!commentId;
   }
+
+  toggleReplayPopup(replayId?: number) {
+  this.selectedReplayId = replayId || null;
+  this.showReplayPopup = !!replayId;
+  }
+
 
   isLiked(userId: number, likes: number[]): boolean {
     return likes.includes(userId);
@@ -97,24 +107,24 @@ export class HomeComponent implements OnInit {
 
   onCommentSubmit(postId: number,event:any) {
     event.preventDefault();
+    const comment_form_div = document.getElementById(`comment-form-${postId}`)
     this.commentService.onCommentSubmit(postId,this.commentForm.value).then(res => res.json()).then((data:any)=>{
       const comment_div = document.querySelector(`.comment_lists-${postId}`);
+      const loop_div = document.createElement('div');
+      loop_div.classList.add('new-comments');
+      comment_div?.insertBefore(loop_div,comment_form_div);
       const new_comment = document.createElement('div');
       new_comment.setAttribute('id',`comment-${data.comment.id}`);
       new_comment.classList.add('position-relative');
       new_comment.innerHTML = this.commentService.commentTemplate(data)
-      comment_div?.appendChild(new_comment);
+      loop_div?.appendChild(new_comment);
     })
     this.commentForm.get('comment')?.setValue('');  
   }
 
-  onReplaySubmit(commentId: number, event: any){
-    const formData = {
-      'replay' : this.replayForm.value,
-      'comment_id' : commentId
-    }    
+  onReplaySubmit(commentId: number, event: any){ 
     event.preventDefault();
-    this.replayService.replaySubmit(formData).then(res => res.json()).then((data:any) => {
+    this.replayService.replaySubmit(this.replayForm.value,commentId).then(res => res.json()).then((data:any) => {
       console.log(data)
       const comment_id = data.replay.comment
       // Append the new review to the list
@@ -170,5 +180,33 @@ export class HomeComponent implements OnInit {
     }
     })
   }
-  
+
+  deleteComment ( event:any) {
+    const radioValue = (event.target as HTMLInputElement).value 
+    const removedDiv = document.getElementById(`comment-${ this.selectedCommentId }`)
+    console.log(removedDiv)
+    // const submited_value = 
+    this.commentService.onCommentDelete(radioValue,this.selectedCommentId).then(res => res.json()).then((data:any)=>{
+      if (data.status == 'success'){
+        removedDiv?.remove()
+        this.togglePopup()
+      } else {
+        this.togglePopup()
+      }
+    })
+  }
+
+  deleteReplay (event:any) {
+    console.log(this.selectedCommentId)
+    const removeReplayDiv = document.getElementById(`replay-${this.selectedReplayId}`)
+    const radioValue = (event.target as HTMLInputElement).value;
+    this.replayService.deleteReplayComment(radioValue,this.selectedReplayId).then(res => res.json()).then((data:any) => {
+      if (data.status == 'success'){
+        removeReplayDiv?.remove()
+        this.toggleReplayPopup()
+      } else {
+        this.toggleReplayPopup()
+      }
+    })
+  }
 }

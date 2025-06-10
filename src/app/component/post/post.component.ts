@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validator, Validators } from '@angular/forms';
 import { PostService } from '../../services/post.service';
 import { Router } from '@angular/router';
+import { NavComponent } from '../nav/nav.component';
 
 @Component({
   selector: 'app-post',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule,NavComponent],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css'
 })

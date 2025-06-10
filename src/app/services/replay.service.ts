@@ -8,11 +8,11 @@ export class ReplayService {
 
   constructor() { }
   private baseUrl = environment.apiUrl
-  private apiUrl = `${this.baseUrl}/replay/replay`
+  private apiUrl = `${this.baseUrl}/replay/replay/`
   private token = localStorage.getItem('access_token')
 
-  replaySubmit(data:any){
-    return fetch(this.apiUrl,{
+  replaySubmit(data:any,commentId:number){
+    return fetch(this.apiUrl + commentId,{
       method : 'POST',
       body : JSON.stringify(data),
       headers : {
@@ -21,6 +21,27 @@ export class ReplayService {
       }
     })
   }
+
+  deleteReplayComment (data: any, replayId:number|null) {
+    return fetch(this.apiUrl + replayId,{
+      method : 'DELETE',
+      body : JSON.stringify(data),
+      headers : {
+        'Content-Type' : 'application/json; charset=UTF-8',
+        'Authorization': `Bearer ${this.token}`
+      }
+    })
+  }
+
+  getUserProfileImage(replay: any): string {
+    // Check if user_profile exists and has profile_picture
+    if (replay.user) {
+        return `${this.baseUrl}/${replay.user.user_profile.profile_picture}`;
+        }else {
+            // Default image if no profile picture exists
+        return 'https://bootdey.com/img/Content/avatar/avatar1.png';
+        }
+    }
 
   replayTemplate (data:any) {
     const replay_template = `
@@ -151,9 +172,9 @@ export class ReplayService {
     </style>
     <div class="p-4 rounded-2 bg-light ms-7">
         <div class="d-flex align-items-center gap-3">
-            <img src="${this.baseUrl}/${data.replay.user.user_profile.profile_picture}" alt="" class="rounded-circle" width="40" height="40">
-            <h6 class="fw-semibold mb-0 fs-4">${data.replay.username }</h6>
-        <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span> just now</span>
+            <img [src]="getUserProfileImage(data.replay)" alt="" class="rounded-circle" width="40" height="40">
+            <h6 class="fw-semibold mb-0 fs-4">${data.replay.user.username }</h6>
+            <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span>${ data.replay.created_at }</span>
         </div>
         <p class="my-3">
         ${data.replay.replay}

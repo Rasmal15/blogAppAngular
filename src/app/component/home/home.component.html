@@ -57,11 +57,11 @@
                         </div>  
                         <div [ngClass]="{'collapse': commentCollapseStates[post.id] || !showComments, 'show': !commentCollapseStates[post.id] && showComments}">
                             <div class="comment_lists-{{ post.id }}">
-                                <div *ngFor="let comment of post.posted_comment">
+                                <div *ngFor="let comment of post.posted_comment" class="new-comments">
                                     <div class="position-relative" id="comment-{{ comment.id }}">
                                         <div class="p-4 rounded-2 bg-light mb-3">
                                             <div class="d-flex align-items-center gap-3">
-                                                <ng-container *ngIf="post.user.user_profile.profile_picture; else noImage">
+                                                <ng-container *ngIf="comment.user.user_profile; else noImage">
                                                     <img [src]="baseUrl + comment.user.user_profile.profile_picture"
                                                         alt="hello"
                                                         class="rounded-circle"
@@ -77,62 +77,39 @@
                                                         height="40">
                                                 </ng-template>
                                                 
-                                                <h6 class="fw-semibold mb-0 fs-4">{{ comment.user.user_profile.name }}</h6>
-                                                <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span> 5 min ago</span>
+                                                <h6 *ngIf="comment.user.user_profile" class="fw-semibold mb-0 fs-4">{{ comment.user.user_profile.name }}</h6>
+                                                <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span>{{ comment.created_at|date:'d/M/Y' }}</span>
                                             </div>
                                             <p class="my-3">
                                             {{ comment.comment }}
                                             </p>
                                             <div class="d-flex align-items-center">
                                                 <div class="d-flex align-items-center gap-2">
-                                                <button class="text-dark d-flex align-items-center justify-content-center bg-light-dark p-2 fs-4 rounded-circle like-cmnt-btn"
-                                                 (click)="likeComment(comment.id)">
-                                                    <i *ngIf="isLiked(user.id, comment.likes)" class="fa fa-thumbs-up" id="i-{{comment.id}}" style="color:red"></i>
-                                                    <i *ngIf="isNotLiked(user.id, comment.likes)" class="fa fa-thumbs-up" id="i-{{comment.id}}" style="color:blue;"></i>
-                                                </button>
-                                                <span class="text-dark fw-semibold" id="comment_like_count-{{ comment.id }}">{{ comment.likes.length }}</span>
+                                                    <button class="text-dark d-flex align-items-center justify-content-center bg-light-dark p-2 fs-4 rounded-circle like-cmnt-btn"
+                                                    (click)="likeComment(comment.id)">
+                                                        <i *ngIf="isLiked(user.id, comment.likes)" class="fa fa-thumbs-up" id="i-{{comment.id}}" style="color:red"></i>
+                                                        <i *ngIf="isNotLiked(user.id, comment.likes)" class="fa fa-thumbs-up" id="i-{{comment.id}}" style="color:blue;"></i>
+                                                    </button>
+                                                    <span class="text-dark fw-semibold" id="comment_like_count-{{ comment.id }}">{{ comment.likes.length }}</span>
                                                 </div>
                                                 <div class="d-flex align-items-center gap-2 ms-4">
-                                                <button class="text-white d-flex align-items-center justify-content-center bg-success p-2 fs-4 rounded-circle"
-                                                (click)="toggleReplays(comment.id)">
-                                                    <i class="fa fa-arrow-down"></i>
-                                                </button>
-                                                <span class="text-dark fw-semibold">{{ comment.replayed_comment.length }}</span>
+                                                    <button class="text-white d-flex align-items-center justify-content-center bg-success p-2 fs-4 rounded-circle"
+                                                    (click)="toggleReplays(comment.id)">
+                                                        <i class="fa fa-arrow-down"></i>
+                                                    </button>
+                                                    <span class="text-dark fw-semibold">{{ comment.replayed_comment.length }}</span>
                                                 </div>
                                                 <div *ngIf="comment.user.username === user.username" class="d-flex align-items-center gap-2 ms-4">
                                                     <button class="text-white d-flex align-items-center justify-content-center bg-danger p-2 fs-4 rounded-circle delete-cmnt-btn"
-                                                    (click)="togglePopup()">
+                                                    (click)="togglePopup(comment.id)">
                                                     <i class="fa fa-trash"></i>
                                                     </button>
-                                                    
-                                                    <div *ngIf="showPopup" class="popup-overlay">
-                                                        <div id="popupDialog-{{ comment.id }}" class="popup-content">
-                                                            <button class="close-btn" (click)="togglePopup()">X</button>
-                                                            <fieldset>
-                                                              <legend>Are you sure you want to delete this?</legend>
-                                                    
-                                                              <form method='post'>
-                                                                <div>
-                                                                  <input class="delete" type="radio" id="delete-comment-yes"
-                                                                        name="delete-comment" value="True"/>
-                                                                  <label for="delete-comment-yes">YES</label>
-                                                                </div>
-                                                              
-                                                                <div>
-                                                                  <input class="delete" type="radio" id="delete-comment-no"
-                                                                        name="delete-comment" value="False"/>
-                                                                  <label for="delete-comment-no">NO</label>
-                                                                </div>
-                                                              </form>
-                                                            </fieldset>
-                                                          </div>
-                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
                                         <div [ngClass]="{'collapse': replayCollapseStates[comment.id] || !showReplays, 'show': !replayCollapseStates[comment.id] && showReplays}">
                                             <div class="replay_lists-{{ comment.id }}">
                                                 <div *ngFor="let replay of comment.replayed_comment">
-                                                    <div class="replay_list-{{ replay.id }}">
+                                                    <div class="replay_list-{{ replay.id }}" id="replay-{{ replay.id }}">
                                                         <div class="p-4 rounded-2 bg-light ms-7">
                                                             <div class="d-flex align-items-center gap-3">
                                                                 <ng-container *ngIf="replay.user.user_profile; else noImage">
@@ -152,11 +129,17 @@
                                                                         height="40">
                                                                     <h6 class="fw-semibold mb-0 fs-4">{{ replay.user.username }}</h6>
                                                                 </ng-template>
-                                                                <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span> just now</span>
+                                                                <span class="fs-2"><span class="p-1 bg-muted rounded-circle d-inline-block"></span>{{ replay.created_at|date:'d/M/Y' }}</span>
                                                             </div>
                                                             <p class="my-3">
                                                                 {{ replay.replay }}
                                                             </p>
+                                                            <div *ngIf="replay.user.username === user.username" class="d-flex align-items-center gap-2 ms-4">
+                                                                <button class="text-white d-flex align-items-center justify-content-center bg-danger p-2 fs-4 rounded-circle delete-cmnt-btn"
+                                                                (click)="toggleReplayPopup(replay.id)">
+                                                                <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -172,7 +155,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center gap-3 p-3">
+                            <div id="comment-form-{{ post.id }}" class="d-flex align-items-center gap-3 p-3">
                                 <form [formGroup]="commentForm" (ngSubmit)="onCommentSubmit(post.id,$event)" class="comment-form">
                                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="rounded-circle" width="33" height="33">
                                     <input type="text" class="form-control py-8" placeholder="Comment" name="comment" formControlName="comment" required>
@@ -184,6 +167,53 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+<div *ngIf="showPopup" class="popup-overlay">
+    <div id="popupDialog" class="popup-content">
+        <button class="close-btn" (click)="togglePopup()">X</button>
+        <fieldset>
+            <legend>Are you sure you want to delete this?</legend>
+
+            <form method='post'>
+            <div>
+                <input (change)="deleteComment($event)" class="delete" type="radio" id="delete-comment-yes"
+                    name="delete-comment" value="True"/>
+                <label for="delete-comment-yes">YES</label>
+            </div>
+            
+            <div>
+                <input (change)="togglePopup()" class="delete" type="radio" id="delete-comment-no"
+                    name="delete-comment" value="False"/>
+                <label for="delete-comment-no">NO</label>
+            </div>
+            </form>
+        </fieldset>
+        </div>
+</div>
+
+<div *ngIf="showReplayPopup" class="popup-overlay">
+    <div id="popupDialog" class="popup-content">
+        <button class="close-btn" (click)="toggleReplayPopup()">X</button>
+        <fieldset>
+            <legend>Are you sure you want to delete this?</legend>
+
+            <form method='post'>
+            <div>
+                <input (change)="deleteReplay($event)" class="delete" type="radio" id="delete-replay-yes"
+                    name="delete-replay" value="True"/>
+                <label for="delete-replay-yes">YES</label>
+            </div>
+            
+            <div>
+                <input (change)="toggleReplayPopup()" class="delete" type="radio" id="delete-replay-no"
+                    name="delete-replay" value="False"/>
+                <label for="delete-replay-no">NO</label>
+            </div>
+            </form>
+        </fieldset>
     </div>
 </div>
 
